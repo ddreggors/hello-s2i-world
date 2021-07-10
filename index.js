@@ -19,7 +19,7 @@ server.listen(port, () => {
 
 function buildHtml(req) {
   var header = '';
-  var body = '<h1>Hello S2I World</h1>\n<br/><hr>\n<br/>\n<p>Thanks for stopping by!</p>';
+  var body = '<h1>Hello S2I World!</h1>\n<br/><hr>\n<br/>\n<p>Thanks for stopping by!</p>';
 
   // concatenate header string
   // concatenate body string
