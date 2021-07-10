@@ -1,0 +1,58 @@
+= Hello S2I World
+
+This is just a small node.js Hello World app that I use to quickly demonstrate S2I builds in Openshift.
+
+== The process
+
+1. In the Developer Catalog select "From Git"
+2. In the resulting dialog fill in this git repo url, the builder image (Node.js), an application name for labeling, a name for resources, resource type DeploymentConfig, and create a route
+3. [OPTIONAL] Add a pipeline if the option is available
+4. Create the application
+
+NOTE: The 'Application' and 'Name' fields may appear to be the same thing, but they are not. The 'Application' field creates labeling to group app resources. Specifically the `app.kubernetes.io/part-of` label in the DeploymentConfig. If you deploy a new app and give it the same 'Application' it will be part-of that application group.
+
+== The pipeline
+
+You should see a 3 step pipeline if you added one. You will see the following steps
+
+1. fetch-repository
+2. build
+3. deploy
+
+== The Service
+
+In the Administrator perspective under 'Networking' or using the OC CLI you will see a new service
+
+----
+$ oc get svc
+NAME                TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)    AGE
+hello-s2i-world   ClusterIP   172.30.123.214   <none>        8080/TCP   18m
+----
+
+Incidentally service names in OCP can be resolved by internal DNS.
+
+<app-name>-<namespace>
+
+Remembering that pods have limited applications, we have to use what is available to test the DNS resolution...
+
+.From Inside the pod
+----
+sh-4.4$ echo -e "const dns = require('dns')\n\ndns.lookup('hello-s2i-world.hello-s2i-world', function(err, result) {\n\tconsole.log(result)\n})"|node
+172.30.123.214
+----
+
+NOTE: The service name lookup resolved inside the pod to `172.30.123.214` which is what we see above from our OC client command
+
+Internal DNS will always resolve service names this way.
+
+
+== The Route
+
+In either the topology view in Developer mode or in the Networking section in Administrator view you can verify the application by clicking the route and opening it in a web browser.
+
+The route will always be the same. It is always built with the following components:
+
+http://<app-name>-<namespace>.apps.<cluster-name>.<base-domain>/
+
+Example Route:
+`http://hello-s2i-world-my-namespace.apps.mycluster.mydomain.net/`
